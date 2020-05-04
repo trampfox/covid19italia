@@ -52,35 +52,36 @@ TMPCSVFILE = '../_data/issues_temp.csv'
 TMPJSONFILE = '../_data/issuesjson_temp.json'
 TMPGEOJSONFILE = '../_data/issues_temp.geojson'
 
+REPO_NAME = 'covid19italia_segnalazioni'
+ORG = 'emergenzeHack'
+TOKEN = os.environ.get('GITHUB_TOKEN')
+
 # Default values for repository name and Github organization
 # They are used if an error occurred while reading values
 # from configuration file
-
 def get_github_client():
+    if TOKEN:
+        return Github(TOKEN)
+
     try:
         config = configparser.RawConfigParser()
         config.read('.github.cfg')
 
-        TOKEN = None
         PASS = config.get('GitHub', 'TOKEN')
         USER = config.get('GitHub', 'USER')
         REPO_NAME = config.get('GitHub', 'REPO_NAME')
         ORG = config.get('GitHub', 'ORG')
     except:
-        TOKEN = os.environ.get('GITHUB_TOKEN')
         PASS = os.environ.get('GITHUB_PASSWORD')
         USER = os.environ.get('GITHUB_USERNAME')
-        REPO_NAME = 'covid19italia_segnalazioni'
-        ORG = 'emergenzeHack'
 
-    if not TOKEN:
-        if not PASS:
-            logger.error("Need a TOKEN")
-            sys.exit(1)
+    if not PASS:
+        logger.error("Need a PASS")
+        sys.exit(1)
 
-        if not USER:
-            logger.error("Need a USER")
-            sys.exit(1)
+    if not USER:
+        logger.error("Need a USER")
+        sys.exit(1)
 
     if not REPO_NAME:
         logger.error("Need a REPO_NAME")
@@ -89,9 +90,6 @@ def get_github_client():
     if not ORG:
         logger.error("Need a ORG")
         sys.exit(1)
-
-    if TOKEN:
-        return Github(TOKEN)
     
     return Github(USER, PASS)
 
